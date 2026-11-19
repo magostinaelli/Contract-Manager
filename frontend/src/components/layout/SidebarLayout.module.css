@@ -1,0 +1,149 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.sidebar {
+  width: 260px;
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.brand {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brand h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.badgeRole {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  background-color: var(--color-border);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm, 4px);
+  font-weight: 600;
+}
+
+.navMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: var(--radius-sm, 6px);
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  background-color: var(--color-hover);
+  color: var(--color-text-primary);
+}
+
+.navLink.active {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 600;
+}
+
+.logo {
+  height: 64px;
+  width: auto;
+}
+
+:global(.dark) .logo {
+  filter: invert(1);
+}
+
+.userName {
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.themeToggleContainer {
+  padding: 1rem;
+  margin-top: auto;
+  border-top: 1px solid var(--color-border);
+}
+
+.themeButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.themeButton:hover {
+  background-color: var(--color-surface);
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 260px;
+  padding: 2rem;
+  background-color: var(--color-background);
+  min-height: 100vh;
+  width: calc(100% - 260px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+  .mainContent {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  .navMenu{
+    align-items: center;
+  }
+}
