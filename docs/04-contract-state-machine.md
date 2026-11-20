@@ -4,10 +4,7 @@ El estado de cada contrato se determina automáticamente a partir de sus fechas
 de inicio y finalización, utilizando la fecha actual (`LocalDate.now()`) y la
 propiedad configurable `contract.expiring-soon-days`.
 
-El cálculo del estado se realiza al crear o modificar un contrato. Además, el
-sistema dispone de un proceso de actualización que permite recalcular los
-estados de los contratos que se encuentran actualmente en `ACTIVE` o
-`EXPIRING_SOON`.
+El cálculo del estado se realiza al crear o modificar un contrato. Además, el sistema recalcula periódicamente los estados de los contratos en `DRAFT`, `ACTIVE` o `EXPIRING_SOON` (ver sección 4).
 
 ## 1. Estados del Contrato
 
@@ -19,8 +16,7 @@ Los estados disponibles son:
 * `EXPIRING_SOON`: el contrato se encuentra vigente y dentro del período
   configurado como próximo a vencer.
 * `EXPIRED`: la fecha de finalización ya fue superada.
-* `UNDER_RENEWAL`: estado disponible para gestión manual relacionado con un
-  proceso de renovación. No forma parte del cálculo automático.
+* `UNDER_RENEWAL`: estado reservado para representar un proceso de renovación. No forma parte del cálculo automático y, en la versión actual, no existe una acción en la interfaz ni en la API para asignarlo; una edición del contrato recalcula el estado a partir de las fechas.
 
 ---
 
@@ -44,7 +40,7 @@ contrato. El backend lo calcula automáticamente a partir de las fechas.
 
 ## 3. Máquina de Estados
 
-```mermaid id="q8w3mt"
+```mermaid
 stateDiagram-v2
     [*] --> DRAFT: Hoy < startDate
     [*] --> ACTIVE: Contrato vigente
@@ -56,34 +52,26 @@ stateDiagram-v2
     ACTIVE --> EXPIRED: Hoy > endDate
     EXPIRING_SOON --> EXPIRED: Hoy > endDate
     EXPIRING_SOON --> ACTIVE: Se extiende endDate
+    EXPIRED --> ACTIVE: Se extiende endDate
 
-    UNDER_RENEWAL: Gestión manual
+    UNDER_RENEWAL: Reservado (sin acción de asignación)
 ```
 
 ---
 
 ## 4. Actualización Automática de Estados
 
-El endpoint:
+El sistema recalcula los estados de los contratos en tres momentos:
 
-`POST /api/contracts/update-statuses`
+* Todos los días a la 01:00, mediante una tarea programada.
+* Cada vez que se inicia la aplicación, para corregir los cambios de estado ocurridos mientras estuvo apagada.
+* A demanda, mediante `POST /api/contracts/update-statuses`.
 
-permite recalcular los estados de los contratos administrados por el sistema.
+El proceso consulta los contratos en `DRAFT`, `ACTIVE` o `EXPIRING_SOON` y calcula nuevamente su estado con las fechas actuales. Los contratos en `EXPIRED` y `UNDER_RENEWAL` no se procesan.
 
-El proceso consulta los contratos que actualmente se encuentran en:
+Si el estado calculado difiere del almacenado, el contrato se actualiza y se registra en la auditoría una entrada `STATUS_CHANGED` con `SYSTEM` como usuario ejecutor.
 
-* `ACTIVE`
-* `EXPIRING_SOON`
-
-Para cada contrato se vuelve a calcular el estado utilizando las fechas
-actuales.
-
-Si el estado calculado es diferente al estado almacenado, el contrato se
-actualiza y se registra una entrada en el historial de auditoría con la acción
-`STATUS_CHANGED`.
-
-Cuando el cambio es realizado por este proceso automático, el usuario
-ejecutor de la auditoría se registra como `SYSTEM`.
+Además, cualquier modificación de las fechas de un contrato recalcula su estado desde cualquier estado de origen. Por ejemplo, extender la `endDate` de un contrato vencido lo devuelve a `ACTIVE` o `EXPIRING_SOON`.
 
 ---
 
@@ -106,19 +94,3 @@ genera un registro:
 
 Esto permite mantener trazabilidad sobre la evolución del estado de cada
 contrato.
-
-
-```mermaid
-stateDiagram-v2
-    [*] --> DRAFT: Hoy < startDate
-    [*] --> ACTIVE: Contrato vigente
-    [*] --> EXPIRING_SOON: Próximo a vencer
-    [*] --> EXPIRED: Hoy > endDate
-
-    DRAFT --> ACTIVE: Comienza el contrato
-    ACTIVE --> EXPIRING_SOON: Hoy >= endDate - expiringSoonDays
-    ACTIVE --> EXPIRED: Hoy > endDate
-    EXPIRING_SOON --> EXPIRED: Hoy > endDate
-    EXPIRING_SOON --> ACTIVE: Extensión de endDate
-
-    UNDER_RENEWAL: Estado manual

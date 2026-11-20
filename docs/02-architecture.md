@@ -145,3 +145,10 @@ sequenceDiagram
         end
     end
 ```
+
+## 6. Arranque del sistema
+
+Al iniciar la aplicación se ejecutan dos procesos:
+
+- Usuario administrador inicial: si no existe ningún usuario ADMIN y están definidas las variables BOOTSTRAP_ADMIN_USERNAME y BOOTSTRAP_ADMIN_PASSWORD, se crea uno. Si ya existe un ADMIN, no se hace nada.
+- Actualización de estados: se recalculan los estados de los contratos, además de la tarea programada diaria de la 01:00.

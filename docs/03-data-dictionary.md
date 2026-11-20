@@ -38,7 +38,7 @@ La base de datos está compuesta por cinco tablas principales:
 |---|---|---|---|
 | id | BIGINT | PK, IDENTITY | Identificador único del cliente. |
 | name | VARCHAR(255) | NOT NULL | Nombre o razón social del cliente. |
-| tax_id | VARCHAR(255) | NULL | Identificación tributaria (CUIT). |
+| tax_id | VARCHAR(255) | NULL | DNI (7 u 8 dígitos) o CUIT/CUIL (11 dígitos). El CUIT/CUIL se guarda con el formato XX-XXXXXXXX-X; el backend normaliza y valida el valor. |
 | email | VARCHAR(255) | NULL | Correo electrónico del cliente. |
 | phone_country_code | VARCHAR(5) | NULL | Código telefónico internacional. |
 | phone_number | VARCHAR(20) | NULL | Número telefónico del cliente. |
@@ -143,6 +143,9 @@ Las relaciones establecidas en la base de datos son las siguientes:
 - Un contrato puede tener múltiples archivos adjuntos.
 - Al eliminar un contrato, sus registros de auditoría y archivos adjuntos se eliminan automáticamente mediante `ON DELETE CASCADE`.
 - No existe eliminación en cascada configurada para la relación entre clientes y contratos.
+- Los campos performed_by (CONTRACT_AUDIT_LOG) y uploaded_by (CONTRACT_ATTACHMENTS) guardan el nombre de usuario como texto y no como clave foránea hacia USERS, de modo que el historial se conserva aunque el usuario sea eliminado.
+- Un cliente con contratos asociados no puede eliminarse: la regla se valida en la capa de servicio y la API responde 409 Conflict.
+- La tabla flyway_schema_history es administrada por Flyway para registrar las migraciones aplicadas y no forma parte del modelo de negocio.
 
 ## 5. Índices y restricciones
 
