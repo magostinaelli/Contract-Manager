@@ -99,7 +99,7 @@ Además, el backend verifica que el archivo solicitado pertenezca al contrato in
 Los datos binarios no se incluyen en las respuestas JSON del listado de adjuntos. La descarga se realiza mediante un endpoint específico que devuelve el contenido con tipo de contenido `application/pdf`.
 
 Al eliminar un contrato, sus archivos adjuntos se eliminan automáticamente mediante una clave foránea con `ON DELETE CASCADE`.
-
+Si el archivo supera los 10 MB, la API responde `413 Payload Too Large`, tanto cuando lo detecta Spring (límite multipart) como cuando lo detecta el servicio. Las demás validaciones responden `400 Bad Request`.
 ### Endpoints asociados
 
 - `POST /api/contracts/{id}/attachments`: subir un PDF.
@@ -152,3 +152,20 @@ Al iniciar la aplicación se ejecutan dos procesos:
 
 - Usuario administrador inicial: si no existe ningún usuario ADMIN y están definidas las variables BOOTSTRAP_ADMIN_USERNAME y BOOTSTRAP_ADMIN_PASSWORD, se crea uno. Si ya existe un ADMIN, no se hace nada.
 - Actualización de estados: se recalculan los estados de los contratos, además de la tarea programada diaria de la 01:00.
+
+## 7. Manejo de errores
+
+`GlobalExceptionHandler` (`@RestControllerAdvice`) centraliza las respuestas de error. El cuerpo es siempre un objeto JSON: `{"error": "mensaje"}` en general, o `{"campo": "mensaje"}` cuando el error pertenece a un campo del formulario.
+
+| Excepción | Estado HTTP | Cuerpo |
+| :--- | :---: | :--- |
+| `MethodArgumentNotValidException` | 400 | `{"campo": "mensaje"}` por cada campo inválido |
+| `InvalidTaxIdException` | 400 | `{"taxId": "mensaje"}` |
+| `IllegalArgumentException` | 400 | `{"error": "mensaje"}` |
+| `InvalidCredentialsException` | 401 | `{"error": "mensaje"}` |
+| `ResourceNotFoundException` | 404 | `{"error": "mensaje"}` |
+| `IllegalStateException` | 409 | `{"error": "mensaje"}` (reglas de negocio, como no eliminar el propio usuario o un cliente con contratos) |
+| `DuplicateResourceException` | 409 | `{"error": "mensaje"}` (por ejemplo, username repetido) |
+| `FileTooLargeException` y `MaxUploadSizeExceededException` | 413 | `{"error": "mensaje"}` |
+
+Cada error de validación de DNI/CUIT/CUIL usa la clave `taxId` para que el frontend lo muestre debajo del campo correspondiente.

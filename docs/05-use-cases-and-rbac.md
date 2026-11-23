@@ -7,7 +7,6 @@ El sistema define dos roles de usuario con diferentes niveles de privilegio sobr
 | Funcionalidad / Endpoint | Métodos HTTP | Rol OPERATOR | Rol ADMIN |
 | :--- | :--- | :---: | :---: |
 | Autenticación / Login | POST /api/auth/login | ✅ | ✅ |
-| Registro de Usuarios | POST /api/auth/register | ❌ | ✅ |
 | Administración de Usuarios | GET /api/users | ❌ | ✅ |
 | Crear Usuario | POST /api/users | ❌ | ✅ |
 | Modificar Rol de Usuario | PUT /api/users/{id}/role | ❌ | ✅ |
@@ -47,6 +46,8 @@ El sistema define dos roles de usuario con diferentes niveles de privilegio sobr
 * Al autenticar correctamente, el sistema retorna un token JWT válido.
 * El endpoint de login es público.
 * Las operaciones protegidas requieren autenticación mediante JWT.
+* Las solicitudes de login sin `username` o sin `password` se rechazan con `400 Bad Request`.
+* El sistema no ofrece autorregistro: las cuentas las crea un `ADMIN` mediante `POST /api/users`.
 
 ### HU-02: Gestión de Contratos (CRUD)
 
@@ -92,6 +93,8 @@ El sistema define dos roles de usuario con diferentes niveles de privilegio sobr
 * Un usuario `OPERATOR` no puede acceder a la administración de usuarios.
 * Un usuario `OPERATOR` que intente consumir un endpoint `DELETE` recibirá una respuesta de acceso denegado.
 * Un administrador no puede eliminar su propio usuario ni cambiar su propio rol (la restricción se valida en el backend y la interfaz deshabilita las acciones).
+* El alta de usuarios se realiza exclusivamente mediante `POST /api/users`.
+* No pueden existir dos usuarios con el mismo `username`: la API responde `409 Conflict`.
 
 ### HU-05: Auditoría de Contratos
 
@@ -118,8 +121,8 @@ El sistema define dos roles de usuario con diferentes niveles de privilegio sobr
 **Criterios de Aceptación:**
 
 * Un contrato puede tener múltiples archivos PDF adjuntos.
-* Cada archivo debe tener un tamaño máximo de 10 MB.
-* El sistema rechaza archivos vacíos o que no presenten la firma inicial `%PDF-`.
+* Cada archivo debe tener un tamaño máximo de 10 MB; si lo supera, la API responde `413 Payload Too Large`.
+* Los archivos vacíos, sin la firma inicial `%PDF-` o con un nombre inválido se rechazan con `400 Bad Request`.
 * Los archivos se almacenan en PostgreSQL utilizando el tipo de dato `BYTEA`.
 * Cada archivo registra su nombre, tamaño, usuario que lo subió y fecha y hora de carga.
 * Los usuarios autenticados con rol `OPERATOR` o `ADMIN` pueden subir archivos, consultar el listado de adjuntos y descargarlos.
