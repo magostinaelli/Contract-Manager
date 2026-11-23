@@ -1,6 +1,7 @@
 package ar.edu.utn.legaltech.contract_manager.service;
 
 import ar.edu.utn.legaltech.contract_manager.dto.UserCreateRequest;
+import ar.edu.utn.legaltech.contract_manager.exception.DuplicateResourceException;
 import ar.edu.utn.legaltech.contract_manager.exception.ResourceNotFoundException;
 import ar.edu.utn.legaltech.contract_manager.model.Role;
 import ar.edu.utn.legaltech.contract_manager.model.User;
@@ -36,8 +37,13 @@ public class UserService {
     }
 
     public User create(UserCreateRequest request) {
-        User user = new User();
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            throw new DuplicateResourceException(
+                    "El username ya existe: " + request.getUsername()
+            );
+        }
 
+        User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());

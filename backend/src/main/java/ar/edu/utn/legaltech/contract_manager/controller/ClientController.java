@@ -35,15 +35,9 @@ public class ClientController {
     @PostMapping
     public ResponseEntity<ClientResponse> create(@Valid @RequestBody ClientRequest request) {
         Client client = new Client();
-        client.setName(request.getName());
-        client.setTaxId(clientService.normalizeTaxId(request.getTaxId()));
-        client.setEmail(request.getEmail());
-        client.setPhoneCountryCode(request.getPhoneCountryCode());
-        client.setPhoneNumber(request.getPhoneNumber());
+        applyRequest(client, request);
 
-        Client saved = clientService.save(client);
-
-        return ResponseEntity.ok(toResponse(saved));
+        return ResponseEntity.ok(toResponse(clientService.save(client)));
     }
 
     @PutMapping("/{id}")
@@ -52,22 +46,23 @@ public class ClientController {
             @Valid @RequestBody ClientRequest request
     ) {
         Client client = clientService.findById(id);
+        applyRequest(client, request);
 
-        client.setName(request.getName());
-        client.setTaxId(clientService.normalizeTaxId(request.getTaxId()));
-        client.setEmail(request.getEmail());
-        client.setPhoneCountryCode(request.getPhoneCountryCode());
-        client.setPhoneNumber(request.getPhoneNumber());
-
-        Client updated = clientService.save(client);
-
-        return ResponseEntity.ok(toResponse(updated));
+        return ResponseEntity.ok(toResponse(clientService.save(client)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         clientService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void applyRequest(Client client, ClientRequest request) {
+        client.setName(request.getName());
+        client.setTaxId(request.getTaxId());
+        client.setEmail(request.getEmail());
+        client.setPhoneCountryCode(request.getPhoneCountryCode());
+        client.setPhoneNumber(request.getPhoneNumber());
     }
 
     private ClientResponse toResponse(Client client) {

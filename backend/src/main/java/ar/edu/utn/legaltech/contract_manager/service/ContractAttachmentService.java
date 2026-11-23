@@ -2,6 +2,7 @@
 package ar.edu.utn.legaltech.contract_manager.service;
 
 import ar.edu.utn.legaltech.contract_manager.dto.ContractAttachmentResponse;
+import ar.edu.utn.legaltech.contract_manager.exception.FileTooLargeException;
 import ar.edu.utn.legaltech.contract_manager.exception.ResourceNotFoundException;
 import ar.edu.utn.legaltech.contract_manager.model.Contract;
 import ar.edu.utn.legaltech.contract_manager.model.ContractAttachment;
@@ -45,7 +46,7 @@ public class ContractAttachmentService {
         }
 
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException("El archivo supera el tamaño máximo de 10 MB");
+            throw new FileTooLargeException("El archivo supera el tamaño máximo de 10 MB");
         }
 
         byte[] fileData = file.getBytes();

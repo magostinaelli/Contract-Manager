@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
-        return ResponseEntity.badRequest().body(Map.of("taxId", ex.getMessage()));
+        return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
@@ -49,5 +49,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(Map.of("error", "El archivo supera el tamaño máximo permitido de 10 MB"));
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicate(DuplicateResourceException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidTaxIdException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidTaxId(InvalidTaxIdException ex) {
+        return ResponseEntity.badRequest().body(Map.of("taxId", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidFileException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidFile(InvalidFileException ex) {
+        return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(FileTooLargeException.class)
+    public ResponseEntity<Map<String, String>> handleFileTooLarge(FileTooLargeException ex) {
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(Map.of("error", ex.getMessage()));
     }
 }

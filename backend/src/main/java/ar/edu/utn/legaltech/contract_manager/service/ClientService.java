@@ -1,5 +1,6 @@
 package ar.edu.utn.legaltech.contract_manager.service;
 
+import ar.edu.utn.legaltech.contract_manager.exception.InvalidTaxIdException;
 import ar.edu.utn.legaltech.contract_manager.exception.ResourceNotFoundException;
 import ar.edu.utn.legaltech.contract_manager.model.Client;
 import ar.edu.utn.legaltech.contract_manager.repository.ClientRepository;
@@ -41,7 +42,7 @@ public class ClientService {
         clientRepository.deleteById(id);
     }
 
-    public String normalizeTaxId(String taxId) {
+    private String normalizeTaxId(String taxId) {
         if (taxId == null || taxId.isBlank()) {
             return null;
         }
@@ -49,7 +50,7 @@ public class ClientService {
         String normalized = taxId.replaceAll("[.\\-\\s]", "");
 
         if (!normalized.matches("\\d+")) {
-            throw new IllegalArgumentException(
+            throw new InvalidTaxIdException(
                     "El DNI/CUIT/CUIL solo puede contener números, puntos, guiones y espacios"
             );
         }
@@ -57,7 +58,7 @@ public class ClientService {
         if (normalized.length() != 7
                 && normalized.length() != 8
                 && normalized.length() != 11) {
-            throw new IllegalArgumentException(
+            throw new InvalidTaxIdException(
                     "El DNI debe tener 7 u 8 dígitos y el CUIT/CUIL debe tener 11 dígitos"
             );
         }

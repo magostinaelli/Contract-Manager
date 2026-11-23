@@ -19,7 +19,7 @@ public class ContractStatusScheduler {
         this.contractService = contractService;
     }
 
-    @Scheduled(cron = "0 0 1 * * *")
+    @Scheduled(cron = "${contract.status-update-cron}")
     public void runDailyStatusUpdate() {
         int updated = contractService.updateStatuses();
         log.info("Daily status update: {} contract(s) updated", updated);

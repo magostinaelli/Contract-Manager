@@ -27,22 +27,6 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    public AuthResponse register(RegisterRequest request) {
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
-
-        userRepository.save(user);
-
-        String token = jwtService.generateToken(
-                user.getUsername(),
-                user.getRole().name()
-        );
-
-        return new AuthResponse(token);
-    }
-
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() ->

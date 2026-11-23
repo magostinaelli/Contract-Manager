@@ -3,6 +3,7 @@ package ar.edu.utn.legaltech.contract_manager.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -52,22 +53,18 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/register").hasRole("ADMIN")
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")
-                        .requestMatchers(
-                                "/api/contracts/*/attachments",
-                                "/api/contracts/*/attachments/**"
-                        ).authenticated()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/v3/api-docs.yaml"
                         ).permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }
