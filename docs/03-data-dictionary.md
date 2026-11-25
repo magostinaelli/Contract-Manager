@@ -28,6 +28,20 @@ La base de datos está compuesta por cinco tablas principales:
 | CONTRACT_AUDIT_LOG | Registra las operaciones realizadas sobre los contratos. |
 | CONTRACT_ATTACHMENTS | Almacena los archivos adjuntos de los contratos. |
 
+### 2.1. Presentación del esquema
+
+La tabla central del modelo es CONTRACTS. Cada contrato pertenece a un único cliente (CLIENTS) y concentra dos tablas dependientes: CONTRACT_AUDIT_LOG, con el historial de acciones realizadas sobre el contrato, y CONTRACT_ATTACHMENTS, con los archivos PDF asociados. Al eliminar un contrato, ambas se eliminan en cascada.
+
+La tabla USERS es independiente: guarda las credenciales y el rol (ADMIN u OPERATOR) de quienes usan el sistema. No se relaciona mediante clave foránea con el resto; la auditoría y los adjuntos registran el nombre de usuario como texto, de modo que el historial se conserva aunque el usuario se elimine.
+
+Las relaciones del esquema son:
+
+- CLIENTS 1:N CONTRACTS
+- CONTRACTS 1:N CONTRACT_AUDIT_LOG
+- CONTRACTS 1:N CONTRACT_ATTACHMENTS
+
+El diagrama entidad-relación completo se encuentra en el documento `01-der-database.md`.
+
 ## 3. Descripción de las tablas
 
 ### 3.1. CLIENTS

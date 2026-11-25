@@ -12,6 +12,23 @@ El sistema sigue una arquitectura REST multicapa desacoplada, donde cada respons
 6. **Database Layer:** Instancia de PostgreSQL 16 ejecutándose en un contenedor Docker, aislada del entorno local. Almacena las entidades del sistema y los archivos PDF adjuntos mediante columnas de tipo `BYTEA`.
 
 ---
+## Módulos del Sistema
+
+El sistema se compone de los siguientes módulos funcionales, todos desarrollados e integrados:
+
+| Módulo | Descripción | Backend | Frontend | Estado |
+| :--- | :--- | :--- | :--- | :---: |
+| Autenticación y sesión | Login con JWT y protección de rutas. | AuthController, JwtService | Login, AuthContext | Implementado |
+| Usuarios y roles | Alta, cambio de rol y baja de usuarios con control de acceso por rol (ADMIN / OPERATOR). | UserController | Users | Implementado |
+| Clientes | Alta, edición y baja de clientes, con validación de DNI/CUIT/CUIL y teléfono. | ClientController | Clients | Implementado |
+| Contratos | Alta, edición y baja de contratos con estado calculado automáticamente según las fechas. | ContractController | Contracts | Implementado |
+| Vencimientos y dashboard | Indicadores, gráficos y recálculo programado diario de estados. | ContractStatusScheduler | Dashboard | Implementado |
+| Auditoría | Historial de acciones sobre cada contrato. | ContractAuditLog | Historial en Contratos | Implementado |
+| Adjuntos PDF | Carga, listado y descarga de PDF por contrato (máx. 10 MB). | ContractAttachmentService | ContractAttachments | Implementado |
+
+Las tablas que respaldan estos módulos están descritas en el diccionario de datos (`data-dictionary.md`) y en el diagrama entidad-relación (`01-der-database.md`).
+
+---
 
 ## 2. Gestión de números telefónicos
 

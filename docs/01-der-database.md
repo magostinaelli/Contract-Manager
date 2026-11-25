@@ -26,7 +26,7 @@ erDiagram
 
     USERS {
         bigint id PK
-        string username
+        string username UK
         string password
         string role
     }
