@@ -114,16 +114,19 @@
 
 .statusChartContent {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 1.25rem;
   min-height: 220px;
+  width: 100%;
+  min-width: 0;
 }
 
 .donutWrapper {
-  flex: 0 1 180px;
-  min-width: 120px;
-  max-width: 180px;
+  flex: 0 0 160px;
+  width: 160px;
+  max-width: 160px;
 }
 
 .donutChart {
@@ -149,11 +152,14 @@
 
 .statusLegend {
   display: flex;
-  flex: 1;
+  flex: 1 1 180px;
   flex-direction: column;
   gap: 0.8rem;
-  min-width: 0;
+  min-width: 180px;
+  max-width: 100%;
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .legendItem {
@@ -161,6 +167,7 @@
   align-items: center;
   gap: 0.5rem;
   min-width: 0;
+  width: 100%;
 }
 
 .legendDot {
@@ -175,7 +182,8 @@
   min-width: 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .legendCount {
